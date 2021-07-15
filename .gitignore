@@ -1,0 +1,6 @@
+*DataSmall/
+*outputs/
+*cnn_models/
+*.vscode/
+*__pycache__/
+* .ipynb_checkpoints/

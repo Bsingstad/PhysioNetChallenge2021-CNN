@@ -4,6 +4,7 @@
 # These are helper functions that you can use with your code.
 
 import os, numpy as np
+import pandas as pd
 
 # Check if a variable is a number or represents a number.
 def is_number(x):
@@ -201,12 +202,14 @@ def get_baselines(header, leads):
 # Get labels from header.
 def get_labels(header):
     labels = list()
+    scored_labels = np.asarray(pd.read_csv("dx_mapping_scored.csv").iloc[:,1], dtype="str")
     for l in header.split('\n'):
         if l.startswith('#Dx'):
             try:
                 entries = l.split(': ')[1].split(',')
                 for entry in entries:
-                    labels.append(entry.strip())
+                    if any(j == entry for j in scored_labels):
+                        labels.append(entry.strip())
             except:
                 pass
     return labels
