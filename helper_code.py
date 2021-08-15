@@ -260,7 +260,7 @@ def load_outputs(output_file):
 #                                                           #
 #-----------------------------------------------------------#
 
-def abbrev(snomed_classes):
+def abbreviation(snomed_classes):
     SNOMED_scored = pd.read_csv("./dx_mapping_scored.csv", sep=",")
     snomed_abbr = []
     for j in range(len(snomed_classes)):

@@ -95,7 +95,7 @@ def training_code(data_directory, model_directory):
                 labels[i, j] = 1
     labels = labels *1
 
-    abbr = abbrev(scored_classes)
+    abbr = abbreviation(scored_classes)
     # Extract the features and labels from the dataset.
     print('Calculate heart rate from lead-II...')
 
