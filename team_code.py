@@ -125,7 +125,7 @@ def training_code(data_directory, model_directory):
         # Train rythm model
         batch_size = 30 # change this to 30!!!
         num_leads = len(leads)
-        epochs = 1
+        epochs = 10
         signal_len = 5000
         train_rythm_model_2(ureg_vs_reg_data, hr_data, ureg_vs_reg_label, num_leads,batch_size, epochs, signal_len, model_name = model_directory + "/" + str(num_leads) + "_leads_rythm")
 
@@ -138,7 +138,7 @@ def training_code(data_directory, model_directory):
         regl_rytm_data = regl_rytm_data[index_array_2]
 
         batch_size = 30
-        epochs = 1
+        epochs = 10
         signal_len = 5000
         train_rythm_model_2(regl_rytm_data, hr_data ,ohe_reg_rythm_classes, num_leads,batch_size, epochs, signal_len, model_name = model_directory + "/" + str(num_leads) + "_leads_regular_rythm")
 
@@ -151,7 +151,7 @@ def training_code(data_directory, model_directory):
         uregl_rytm_data = uregl_rytm_data[index_array_3]
 
         batch_size = 30
-        epochs = 1
+        epochs = 10
         signal_len = 5000
         train_rythm_model_2(uregl_rytm_data,hr_data,ohe_ureg_rythm_classes, num_leads,batch_size, epochs, signal_len, model_name = model_directory + "/" +str(num_leads) + "_leads_irregular_rhythm")
 
@@ -161,7 +161,7 @@ def training_code(data_directory, model_directory):
         for i in other_diag:
             new_diag = finn_diagnoser(labels,abbr,i)
             batch_size = 30
-            epochs = 1
+            epochs = 5
             signal_len = 5000
             name = str(num_leads) + "_leads_" + i
             train_classifier_chain(np.asarray(recording_files),cc_data,new_diag, num_leads,batch_size, epochs, signal_len,model_name = model_directory + "/" + name)
