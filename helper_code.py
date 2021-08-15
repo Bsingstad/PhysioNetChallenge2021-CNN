@@ -261,15 +261,15 @@ def load_outputs(output_file):
 #-----------------------------------------------------------#
 
 def abbrev(snomed_classes):
-  SNOMED_scored = pd.read_csv("./dx_mapping_scored.csv", sep=",")
-  snomed_abbr = []
-  for j in range(len(snomed_classes)):
-      for i in range(len(SNOMED_scored.iloc[:,1])):
-          if (str(SNOMED_scored.iloc[:,1][i]) == snomed_classes[j]):
-              snomed_abbr.append(SNOMED_scored.iloc[:,0][i])
-              
-  snomed_abbr = np.asarray(snomed_abbr)
-  return snomed_abbr
+    SNOMED_scored = pd.read_csv("./dx_mapping_scored.csv", sep=",")
+    snomed_abbr = []
+    for j in range(len(snomed_classes)):
+        for i in range(len(SNOMED_scored.iloc[:,1])):
+            if (str(SNOMED_scored.iloc[:,1][i]) == snomed_classes[j]):
+                snomed_abbr.append(SNOMED_scored.iloc[:,0][i])
+                
+    snomed_abbr = np.asarray(snomed_abbr)
+    return snomed_abbr
 
 def load_challenge_data(filename):
     x = loadmat(filename)
@@ -281,29 +281,29 @@ def load_challenge_data(filename):
     return data, header_data
 
 def pan_tompkins(data, fs):
-  lowcut = 5.0
-  highcut = 15.0
-  filter_order = 2
-  nyquist_freq = 0.5 * fs
+    lowcut = 5.0
+    highcut = 15.0
+    filter_order = 2
+    nyquist_freq = 0.5 * fs
 
-  low = lowcut / nyquist_freq
-  high = highcut / nyquist_freq
+    low = lowcut / nyquist_freq
+    high = highcut / nyquist_freq
 
-  b, a = butter(filter_order, [low, high], btype="band")
-  y = lfilter(b, a, data)
+    b, a = butter(filter_order, [low, high], btype="band")
+    y = lfilter(b, a, data)
 
-  diff_y = np.ediff1d(y)
-  squared_diff_y=diff_y**2
-  integrated_squared_diff_y =np.convolve(squared_diff_y,np.ones(5))
+    diff_y = np.ediff1d(y)
+    squared_diff_y=diff_y**2
+    integrated_squared_diff_y =np.convolve(squared_diff_y,np.ones(5))
 
-  max_h = integrated_squared_diff_y.max()
+    max_h = integrated_squared_diff_y.max()
 
-  peaks=find_peaks(integrated_squared_diff_y,height=max_h/2, distance=fs/3)
+    peaks=find_peaks(integrated_squared_diff_y,height=max_h/2, distance=fs/3)
 
-  hr = np.nanmean(60 /(np.diff(peaks[0])/fs)).mean()
+    hr = np.nanmean(60 /(np.diff(peaks[0])/fs)).mean()
 
 
-  return hr
+    return hr
 
 def butter_lowpass(cutoff, fs, order=5):
     nyq = 0.5 * fs
@@ -317,59 +317,59 @@ def butter_lowpass_filter(data, cutoff, fs, order=5):
     return y
 
 def calc_hr(ecg_filenames):
-  heart_rate = np.zeros(len(ecg_filenames))
-  for i,j in enumerate(ecg_filenames):
-    data, head = load_challenge_data(j)
-    heart_rate[i] = pan_tompkins(data[1],int(head[0].split(" ")[2]))
-  heart_rate[np.where(np.isnan(heart_rate))[0]] = np.nanmean(heart_rate)
-  return heart_rate
+    heart_rate = np.zeros(len(ecg_filenames))
+    for i,j in enumerate(ecg_filenames):
+        data, head = load_challenge_data(j)
+        heart_rate[i] = pan_tompkins(data[1],int(head[0].split(" ")[2]))
+    heart_rate[np.where(np.isnan(heart_rate))[0]] = np.nanmean(heart_rate)
+    return heart_rate
 
 def calc_hr_predict(data,header):
-  heart_rate = pan_tompkins(data[1],int(header.split(" ")[2]))
-  if heart_rate == "NaN":
-    heart_rate = 80
-  return heart_rate
+    heart_rate = pan_tompkins(data[1],int(header.split(" ")[2]))
+    if heart_rate == "NaN":
+        heart_rate = 80
+    return heart_rate
 
 
 def regelmessigVSuregelmessig(labels, abbr):
-  atrieflutter = np.where(labels[:,np.where(abbr == 'atrial flutter')[0]] == 1)[0]
-  pacerythm = np.where(labels[:,np.where(abbr == 'pacing rhythm')[0]] == 1)[0]
-  sinus = np.where(labels[:,np.where(abbr == 'sinus rhythm')[0]] == 1)[0]
-  sinus_brad = np.where(labels[:,np.where(abbr == 'sinus bradycardia')[0]] == 1)[0]
-  sinus_tach = np.where(labels[:,np.where(abbr == 'sinus tachycardia')[0]] == 1)[0]
-  sinus_arr = np.where(labels[:,np.where(abbr == 'sinus arrhythmia')[0]] == 1)[0]
-  #------------------------------------------------------------------------------
-  regelmessig = np.unique(np.concatenate([atrieflutter,pacerythm,sinus,sinus_brad,sinus_tach,sinus_arr]))
-  #------------------------------------------------------------------------------
-  afib = np.where(labels[:,np.where(abbr == 'atrial fibrillation')[0]] == 1)[0]
-  VES1 = np.where(labels[:,np.where(abbr == 'ventricular premature beats')[0]] == 1)[0]
-  VES2 = np.where(labels[:,np.where(abbr == 'premature ventricular contractions')[0]] == 1)[0]
-  VES = np.concatenate([VES1,VES2])
-  SVES1 = np.where(labels[:,np.where(abbr == 'supraventricular premature beats')[0]] == 1)[0]
-  SVES2 = np.where(labels[:,np.where(abbr == 'premature atrial contraction')[0]] == 1)[0]
-  SVES = np.concatenate([SVES1,SVES2])
-  #------------------------------------------------------------------------------
-  uregelmessig = np.unique(np.concatenate([afib,VES,SVES]))
-  #------------------------------------------------------------------------------
-  del_ureg, del_reg = np.intersect1d(uregelmessig,regelmessig,return_indices=True)[1:]
+    atrieflutter = np.where(labels[:,np.where(abbr == 'atrial flutter')[0]] == 1)[0]
+    pacerythm = np.where(labels[:,np.where(abbr == 'pacing rhythm')[0]] == 1)[0]
+    sinus = np.where(labels[:,np.where(abbr == 'sinus rhythm')[0]] == 1)[0]
+    sinus_brad = np.where(labels[:,np.where(abbr == 'sinus bradycardia')[0]] == 1)[0]
+    sinus_tach = np.where(labels[:,np.where(abbr == 'sinus tachycardia')[0]] == 1)[0]
+    sinus_arr = np.where(labels[:,np.where(abbr == 'sinus arrhythmia')[0]] == 1)[0]
+    #------------------------------------------------------------------------------
+    regelmessig = np.unique(np.concatenate([atrieflutter,pacerythm,sinus,sinus_brad,sinus_tach,sinus_arr]))
+    #------------------------------------------------------------------------------
+    afib = np.where(labels[:,np.where(abbr == 'atrial fibrillation')[0]] == 1)[0]
+    VES1 = np.where(labels[:,np.where(abbr == 'ventricular premature beats')[0]] == 1)[0]
+    VES2 = np.where(labels[:,np.where(abbr == 'premature ventricular contractions')[0]] == 1)[0]
+    VES = np.concatenate([VES1,VES2])
+    SVES1 = np.where(labels[:,np.where(abbr == 'supraventricular premature beats')[0]] == 1)[0]
+    SVES2 = np.where(labels[:,np.where(abbr == 'premature atrial contraction')[0]] == 1)[0]
+    SVES = np.concatenate([SVES1,SVES2])
+    #------------------------------------------------------------------------------
+    uregelmessig = np.unique(np.concatenate([afib,VES,SVES]))
+    #------------------------------------------------------------------------------
+    del_ureg, del_reg = np.intersect1d(uregelmessig,regelmessig,return_indices=True)[1:]
 
-  uregelmessig = np.delete(uregelmessig, del_ureg)
-  regelmessig = np.delete(regelmessig, del_reg)
-  return regelmessig, uregelmessig
+    uregelmessig = np.delete(uregelmessig, del_ureg)
+    regelmessig = np.delete(regelmessig, del_reg)
+    return regelmessig, uregelmessig
 
 
 def rytme_labels(labels, abbr):
-  rythm_labels = labels[:,[int(np.where(abbr == 'atrial flutter')[0]),int(np.where(abbr == 'pacing rhythm')[0]), int(np.where(abbr == 'sinus rhythm')[0]),
-          int(np.where(abbr == 'sinus bradycardia')[0]), int(np.where(abbr == 'sinus tachycardia')[0]),int(np.where(abbr == 'sinus arrhythmia')[0]),
-          int(np.where(abbr == 'atrial fibrillation')[0]), int(np.where(abbr == 'ventricular premature beats')[0]) | int(np.where(abbr == 'premature ventricular contractions')[0]),
-          int(np.where(abbr == 'supraventricular premature beats')[0]) | int(np.where(abbr == 'premature atrial contraction')[0])]]
-  return rythm_labels
+    rythm_labels = labels[:,[int(np.where(abbr == 'atrial flutter')[0]),int(np.where(abbr == 'pacing rhythm')[0]), int(np.where(abbr == 'sinus rhythm')[0]),
+            int(np.where(abbr == 'sinus bradycardia')[0]), int(np.where(abbr == 'sinus tachycardia')[0]),int(np.where(abbr == 'sinus arrhythmia')[0]),
+            int(np.where(abbr == 'atrial fibrillation')[0]), int(np.where(abbr == 'ventricular premature beats')[0]) | int(np.where(abbr == 'premature ventricular contractions')[0]),
+            int(np.where(abbr == 'supraventricular premature beats')[0]) | int(np.where(abbr == 'premature atrial contraction')[0])]]
+    return rythm_labels
 
 def finn_diagnoser(labels, abbr, navn):
-  arr = np.zeros((labels.shape[0],1))
-  idx = np.where(labels[:,np.where(abbr == navn)[0]] == 1)[0]
-  arr[idx] = 1
-  return arr
+    arr = np.zeros((labels.shape[0],1))
+    idx = np.where(labels[:,np.where(abbr == navn)[0]] == 1)[0]
+    arr[idx] = 1
+    return arr
 
 
 
